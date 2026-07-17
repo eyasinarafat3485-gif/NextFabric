@@ -71,7 +71,7 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden bg-zinc-950 text-zinc-50">
-      
+
       {/* ---------------------------------------------------- */}
       {/* SECTION 1: HERO SECTION                              */}
       {/* ---------------------------------------------------- */}
@@ -79,7 +79,7 @@ export default function Home() {
         {/* Background visual details */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_60%)] pointer-events-none" />
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-zinc-950 via-zinc-950/20 to-transparent pointer-events-none" />
-        
+
         <div className="mx-auto max-w-4xl space-y-8 z-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/60 px-4 py-1.5 text-xs text-zinc-300 backdrop-blur-md glow-border">
             <span className="h-2 w-2 rounded-full bg-brand-cyan animate-pulse" />
@@ -219,7 +219,7 @@ export default function Home() {
               border: "hover:border-brand-cyan/30"
             }
           ].map((cat, idx) => (
-            <div 
+            <div
               key={idx}
               className={`glow-border group relative rounded-2xl bg-zinc-900/40 p-8 flex flex-col justify-between overflow-hidden transition-all duration-300 ${cat.border}`}
             >
@@ -234,7 +234,7 @@ export default function Home() {
                 <p className="text-zinc-400 text-sm leading-relaxed mb-8">{cat.description}</p>
               </div>
 
-              <Link 
+              <Link
                 href={cat.link}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-brand-cyan group-hover:text-brand-cyan/80 transition-colors"
               >
@@ -264,14 +264,14 @@ export default function Home() {
               Harvested from the organic flax fields of Belgium, and loomed on historical mechanical looms in Italy. This fabric possesses a unique slub and tactile density that synthetic operations cannot copy. Ideal for statement summer trousers, structured shirts, and fine linen suits.
             </p>
             <div className="pt-4 flex flex-wrap gap-4">
-              <Link 
-                href="/shop/heritage-linen" 
+              <Link
+                href="/shop/heritage-linen"
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 transition-colors"
               >
                 Shop Heritage Collection
               </Link>
-              <Link 
-                href="/swatches/request?pack=heritage" 
+              <Link
+                href="/swatches/request?pack=heritage"
                 className="rounded-xl border border-white/10 bg-zinc-900/80 px-5 py-3 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all"
               >
                 Request Swatch Pack
@@ -367,7 +367,7 @@ export default function Home() {
                   "{t.quote}"
                 </blockquote>
               </div>
-              
+
               <div className="border-t border-white/5 pt-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 font-bold text-sm text-brand-cyan">
                   {t.author.charAt(0)}

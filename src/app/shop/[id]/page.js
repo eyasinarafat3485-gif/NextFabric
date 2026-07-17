@@ -1,0 +1,261 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { FALLBACK_PRODUCTS } from '../page';
+
+export default function ProductDetails({ params }) {
+  // Unwrap parameters using React.use() as standard in modern Next.js
+  const { id } = React.use(params);
+
+  const [product, setProduct] = useState(null);
+  const [yards, setYards] = useState(2); // Default to 2 yards
+  const [cartSuccess, setCartSuccess] = useState(false);
+  const [swatchSuccess, setSwatchSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 1. First search in local fallback catalog
+    const localProduct = FALLBACK_PRODUCTS.find(p => p.id === id);
+    
+    if (localProduct) {
+      setProduct(localProduct);
+      setLoading(false);
+    }
+
+    // 2. Also try fetching live product from Express database
+    async function fetchLiveProduct() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/items`);
+        if (res.ok) {
+          const data = await res.json();
+          const liveProduct = data.find(p => (p._id === id || p.id === id));
+          if (liveProduct) {
+            setProduct({
+              ...liveProduct,
+              id: liveProduct._id || liveProduct.id,
+              specs: liveProduct.specs || {
+                composition: 'Custom Weave Blend',
+                weight: 'Varying GSM',
+                width: '58 inches',
+                origin: 'Sourced Mill',
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.log('Unable to reach live Express server for dynamic product ID:', id);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLiveProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-32 text-center text-zinc-400 bg-zinc-950">
+        <p className="text-lg">Analyzing textile database...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-32 text-center bg-zinc-950">
+        <h2 className="text-2xl font-bold text-white mb-4">Fabric Spec Not Found</h2>
+        <p className="text-zinc-400 mb-8">The requested textile code could not be verified in our catalog.</p>
+        <Link
+          href="/shop"
+          className="rounded-xl bg-brand-indigo hover:bg-brand-indigo/90 px-6 py-3 text-sm font-semibold text-white transition-colors"
+        >
+          Return to Shop
+        </Link>
+      </div>
+    );
+  }
+
+  const totalPrice = product.price * yards;
+
+  const handleAddToCart = () => {
+    setCartSuccess(true);
+    setTimeout(() => setCartSuccess(false), 3000);
+  };
+
+  const handleRequestSwatch = () => {
+    setSwatchSuccess(true);
+    setTimeout(() => setSwatchSuccess(false), 3000);
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 bg-zinc-950 text-zinc-50">
+      
+      {/* Back button */}
+      <div className="mb-8">
+        <Link 
+          href="/shop" 
+          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
+        >
+          &larr; Back to Fabric Catalog
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        
+        {/* Left Column: Image preview */}
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/5 h-[400px] sm:h-[500px]">
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="w-full h-full object-cover opacity-90"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+          {/* Fallback pattern preview */}
+          <div className="hidden absolute inset-0 bg-gradient-to-br from-brand-indigo/15 to-brand-cyan/20 flex flex-col items-center justify-center text-zinc-500 font-semibold tracking-wider text-sm">
+            Zoomed Thread View
+          </div>
+        </div>
+
+        {/* Right Column: Specifications & Pricing */}
+        <div className="flex flex-col justify-between space-y-8">
+          <div className="space-y-6">
+            
+            {/* Tags and Title */}
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-md bg-white/5 border border-white/10 px-2.5 py-0.5 text-xs font-semibold text-zinc-300 backdrop-blur-sm capitalize">
+                  {product.category}
+                </span>
+                {product.tags && product.tags.map((tag, idx) => (
+                  <span key={idx} className="rounded-md bg-brand-indigo/10 border border-brand-indigo/20 px-2.5 py-0.5 text-xs font-medium text-brand-cyan">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                {product.title}
+              </h1>
+            </div>
+
+            {/* Price Box */}
+            <div className="border-b border-white/5 pb-6">
+              <p className="text-2xl font-bold text-white">
+                ${product.price.toFixed(2)}
+                <span className="text-sm text-zinc-500 font-normal"> / yard</span>
+              </p>
+            </div>
+
+            {/* Fabric Details */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold tracking-wider text-white uppercase">Product Overview</h3>
+              <p className="text-sm sm:text-base leading-relaxed text-zinc-400">
+                {product.fullDescription}
+              </p>
+            </div>
+
+            {/* Technical Specifications */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold tracking-wider text-white uppercase">Technical Specs</h3>
+              <div className="grid grid-cols-2 gap-4 border border-white/5 rounded-2xl p-6 bg-zinc-900/20">
+                <div>
+                  <div className="text-xs text-zinc-500">Composition</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs.composition}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">GSM Weight</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs.weight}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Roll Width</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs.width}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-zinc-500">Mill Origin</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs.origin}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Sizing & Actions */}
+          <div className="space-y-6 pt-6 border-t border-white/5">
+            
+            {/* Yardage Selector */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <label htmlFor="quantity" className="block text-sm font-semibold text-zinc-200">
+                  Select Quantity (Yards)
+                </label>
+                <p className="text-xs text-zinc-500 mt-1">Minimum order is 1 yard.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setYards(Math.max(1, yards - 1))}
+                  className="rounded-lg bg-zinc-900 border border-white/10 w-10 h-10 flex items-center justify-center font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  -
+                </button>
+                <input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  value={yards}
+                  onChange={(e) => setYards(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="rounded-lg bg-zinc-900 border border-white/10 w-16 h-10 text-center font-semibold text-white focus:outline-none focus:border-brand-indigo/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <button
+                  onClick={() => setYards(yards + 1)}
+                  className="rounded-lg bg-zinc-900 border border-white/10 w-10 h-10 flex items-center justify-center font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Total Price Display */}
+            <div className="flex items-center justify-between border-t border-white/5 pt-4">
+              <span className="text-sm font-semibold text-zinc-400">Total Price Estimate</span>
+              <span className="text-xl font-bold text-brand-cyan">${totalPrice.toFixed(2)}</span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={handleAddToCart}
+                className="w-full rounded-xl bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 px-6 py-4 text-sm font-semibold text-white shadow-lg transition-all cursor-pointer"
+              >
+                Add To Design Cart
+              </button>
+              <button
+                onClick={handleRequestSwatch}
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 hover:bg-zinc-800 px-6 py-4 text-sm font-semibold text-zinc-300 transition-colors cursor-pointer"
+              >
+                Request Swatch Preview
+              </button>
+            </div>
+
+            {/* Success notifications */}
+            {cartSuccess && (
+              <div className="rounded-xl border border-brand-cyan/20 bg-brand-cyan/5 p-3 text-brand-cyan text-xs font-medium text-center animate-fade-in">
+                ✓ Yards added to your active design workspace cart!
+              </div>
+            )}
+            {swatchSuccess && (
+              <div className="rounded-xl border border-brand-indigo/20 bg-brand-indigo/5 p-3 text-brand-indigo text-xs font-medium text-center animate-fade-in">
+                ✓ Swatch sample request added. Swatch cards ship free!
+              </div>
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
