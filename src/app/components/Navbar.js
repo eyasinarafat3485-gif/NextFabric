@@ -17,45 +17,9 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-  // const handleDemoLogin = async () => {
-  //   try {
-  //     const res = await fetch('http://localhost:5000/api/demo-login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-  //     const data = await res.json();
-  //     if (res.ok && data.success) {
-  //       const { email, password } = data.credentials;
-  //       try {
-  //         await signIn.email({
-  //           email,
-  //           password,
-  //         });
-  //         window.location.href = '/shop';
-  //       } catch (err) {
-  //         // If user doesn't exist, register and sign in
-  //         await signUp.email({
-  //           email,
-  //           password,
-  //           name: data.user.name,
-  //         });
-  //         window.location.href = '/shop';
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error('Demo login connection error:', err);
-  //     // Fallback
-  //     localStorage.setItem('user', JSON.stringify({ name: 'Demo User', email: 'demo@example.com' }));
-  //     window.location.href = '/shop';
-  //   }
-  // };
-
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success("User logged out")
     } catch (err) {
       console.error('Error signing out:', err);
     }
@@ -136,12 +100,6 @@ export default function Navbar() {
                 >
                   Register
                 </Link>
-                {/* <button
-                  onClick={handleDemoLogin}
-                  className="rounded-lg bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 px-4 py-2 text-sm font-medium text-white transition-all shadow-md shadow-brand-indigo/10 cursor-pointer"
-                >
-                  Demo Login
-                </button> */}
               </>
             )}
           </div>
@@ -252,15 +210,7 @@ export default function Navbar() {
                 >
                   Register
                 </Link>
-                {/* <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    handleDemoLogin();
-                  }}
-                  className="w-full rounded-lg bg-gradient-to-r from-brand-indigo to-brand-cyan px-4 py-2 text-base font-medium text-white text-center shadow-md cursor-pointer"
-                >
-                  Demo Login
-                </button> */}
+
               </>
             )}
           </div>
