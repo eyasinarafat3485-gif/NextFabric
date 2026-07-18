@@ -18,7 +18,6 @@ export default function MyCollection() {
         const loggedInUser = JSON.parse(storedUser);
         setUserEmail(loggedInUser.email);
 
-        // ২. শুধুমাত্র ওই ইউজারের ইমেইল কুয়েরি প্যারামিটার দিয়ে ডেটা ফেচ করা
         async function fetchUserCollection() {
             try {
                 const res = await fetch(`http://localhost:5000/api/user-collection?email=${loggedInUser.email}`);
@@ -41,13 +40,14 @@ export default function MyCollection() {
             <div className="mx-auto max-w-7xl">
 
                 {/* Header section */}
-                <div className="border-b border-white/5 pb-8 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className=" pb-8 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-4xl font-extrabold tracking-tight">My Fabric Collection</h1>
+                        <h1 className="text-5xl font-bold mb-4">My Fabric Collection</h1>
                         <p className="text-zinc-400 text-sm mt-2">
                             Private workspace vault for: <span className="text-brand-cyan font-mono">{userEmail || 'Guest'}</span>
                         </p>
                     </div>
+
                     <Link
                         href="/shop"
                         className="rounded-xl border border-white/10 hover:border-brand-indigo/40 px-4 py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors self-start sm:self-auto"
