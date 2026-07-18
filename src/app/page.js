@@ -352,7 +352,7 @@ export default function Home() {
       {/* SECTION 4: VISUAL HIGHLIGHTS / DYNAMIC BANNER        */}
       {/* ---------------------------------------------------- */}
       <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/40 border border-white/5 px-6 py-15 shadow-2xl sm:px-12 sm:py-24 lg:px-20">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/40 border border-white/5 px-6 py-15 shadow-2xl ">
           {/* Neon radial mesh glow */}
           <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-gradient-to-br from-brand-indigo/25 to-brand-cyan/25 blur-3xl pointer-events-none" />
 
