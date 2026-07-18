@@ -107,10 +107,10 @@ export default function Home() {
               Browse Fabric Shop
             </Link>
             <Link
-              href="/swatches"
+              href="/login"
               className="rounded-2xl border border-white/15 bg-zinc-900/40 hover:bg-zinc-900/80 px-8 py-4 text-sm font-semibold text-zinc-200 transition-colors cursor-pointer"
             >
-              Order Swatch Cards
+              Login here
             </Link>
           </div>
         </div>
