@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut, signIn, signUp } from "@/app/lib/auth-client";
 import { toast } from 'react-toastify';
+import { FaRegUser } from 'react-icons/fa';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,8 +77,9 @@ export default function Navbar() {
               <span className="text-xs text-zinc-500">Checking session...</span>
             ) : session ? (
               <>
-                <span className="text-sm text-zinc-400 font-medium">
-                  Hi, {session.user.name || session.user.email}
+                <span className="text-sm text-zinc-400 font-medium flex items-center gap-1.5">
+                  <FaRegUser />
+                  <span>Hi, {session.user.name || session.user.email}</span>
                 </span>
                 <button
                   onClick={handleSignOut}
