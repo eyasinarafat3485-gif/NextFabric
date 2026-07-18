@@ -8,9 +8,9 @@ export default function AboutPage() {
     return (
         <div className="min-h-screen bg-zinc-950  text-zinc-200">
             {/* Hero Section */}
-            <div className="bg-zinc-950 py-2">
+            <div className="bg-zinc-950 pt-8">
                 <div className="mx-auto px-6 text-center">
-                    <h1 className="text-6xl font-bold mb-6">About NextFabric</h1>
+                    <h1 className="text-5xl font-bold mb-4">About NextFabric</h1>
                     <p className="text-2xl text-zinc-400  mx-auto">
                         Premium fabric &amp; fashion for the modern generation.
                     </p>

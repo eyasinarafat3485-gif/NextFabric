@@ -80,7 +80,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_60%)] pointer-events-none" />
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-zinc-950 via-zinc-950/20 to-transparent pointer-events-none" />
 
-        <div className="mx-auto max-w-4xl space-y-8 z-10">
+        <div className="mx-auto max-w-4xl space-y-8 z-10 pt-15">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/60 px-4 py-1.5 text-xs text-zinc-300 backdrop-blur-md glow-border">
             <span className="h-2 w-2 rounded-full bg-brand-cyan animate-pulse" />
             <span>Discover Sustainable Weaves</span>

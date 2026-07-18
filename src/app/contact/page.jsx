@@ -61,7 +61,7 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-200">
             {/* Hero Section */}
-            <div className="bg-zinc-950 py-20 ">
+            <div className="bg-zinc-950 pt-8 ">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <h1 className="text-5xl font-bold mb-4">Contact Us</h1>
                     <p className="text-zinc-400 text-xl">

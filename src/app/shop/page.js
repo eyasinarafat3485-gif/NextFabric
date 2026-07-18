@@ -199,7 +199,7 @@ export default function Shop() {
       
       {/* Page Header */}
       <div className="border-b border-white/5 pb-8 mb-8 space-y-4">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white">Fabric Catalog</h1>
+        <h1 className="text-5xl font-bold mb-4">Fabric Catalog</h1>
         <p className="text-zinc-400 text-sm max-w-2xl">
           Browse our collection of hand-inspected, premium fabrics. Filter by fiber type, search by weave keyword, or sort by pricing metrics.
         </p>

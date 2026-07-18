@@ -179,7 +179,7 @@ export default function Dashboard() {
       {/* Dashboard Header */}
       <div className="border-b border-white/5 pb-8 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white">Fabric Inventory Management</h1>
+          <h1 className="text-5xl font-bold mb-4">Fabric Inventory Management</h1>
           <p className="text-zinc-400 text-sm mt-2 max-w-xl">
             Admin console to monitor stock levels, add new textile weaves, or delete outdated rolls.
           </p>
