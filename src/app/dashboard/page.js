@@ -1,21 +1,32 @@
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FALLBACK_PRODUCTS } from '../shop/page';
+import { toast } from 'react-toastify';
+
+// পরিবেশ ভেরিয়েবল থেকে ব্যাকএন্ড URL নেওয়া হচ্ছে
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
+// বিল্ড এরর ফিক্স করার জন্য লোকাল ফলব্যাক ডিফাইন করা হলো
+const FALLBACK_PRODUCTS = [];
 
 export default function Dashboard() {
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]); // নতুন অর্ডার স্টেট
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [validationError, setValidationError] = useState('');
 
-  // Form State
+  // Toast UI এর জন্য স্টেট
+  const [showToast, setShowToast] = useState(false);
+
+  // Form State (ডিফল্ট ক্যাটাগরি 'shirt' সেট করা হলো যা ড্রপডাউনের প্রথম অপশন)
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('cotton');
+  const [category, setCategory] = useState('shirt');
   const [shortDesc, setShortDesc] = useState('');
   const [fullDesc, setFullDesc] = useState('');
   const [price, setPrice] = useState('');
@@ -25,7 +36,7 @@ export default function Dashboard() {
   // Fetch items from backend
   const fetchItems = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/items');
+      const res = await fetch(`${SERVER_URL}/api/items`);
       if (res.ok) {
         const data = await res.json();
         if (data && data.length > 0) {
@@ -41,10 +52,10 @@ export default function Dashboard() {
     } finally { setLoading(false); }
   };
 
-  // সব ইউজারের অর্ডার নিয়ে আসার ফাংশন
+  // সব ইউজারের অর্ডার নিয়ে আসার ফাংশন
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/orders');
+      const res = await fetch(`${SERVER_URL}/api/admin/orders`);
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -64,11 +75,11 @@ export default function Dashboard() {
   // অর্ডার কনফার্ম হ্যান্ডলার
   const handleConfirmOrder = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/confirm`, {
+      const res = await fetch(`${SERVER_URL}/api/admin/orders/${orderId}/confirm`, {
         method: 'PATCH',
       });
       if (res.ok) {
-        setSuccess('Order status updated to Confirmed!');
+        toast.success('Order successfully Confirmed!');
         fetchOrders();
       }
     } catch (err) {
@@ -76,14 +87,13 @@ export default function Dashboard() {
     }
   };
 
-  // অর্ডার ডিলিট হ্যান্ডলার
   const handleDeleteOrder = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${orderId}`, {
+      const res = await fetch(`${SERVER_URL}/api/admin/orders/${orderId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
-        setSuccess('Order deleted successfully!');
+        toast.success('Order deleted successfully!');
         fetchOrders();
       }
     } catch (err) {
@@ -115,7 +125,6 @@ export default function Dashboard() {
       return;
     }
 
-    // FIX: শক্তিশালী URL Regex লজিক (যা কুয়েরি প্যারামিটারসহ জটিল লিংকেও আটকাবে না)
     const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
     if (!imageUrl.trim() || !urlRegex.test(imageUrl.trim())) {
       setValidationError('Please enter a valid Image URL starting with http:// or https://');
@@ -126,39 +135,56 @@ export default function Dashboard() {
     const newItemPayload = { title, category, shortDescription: shortDesc, fullDescription: fullDesc, price: parseFloat(price), imageUrl, tags };
 
     try {
-      const res = await fetch('http://localhost:5000/api/items', {
+      const res = await fetch(`${SERVER_URL}/api/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItemPayload),
       });
 
       if (res.ok) {
-        setSuccess('New fabric added successfully to database!');
+        // সফল হলে Toast ট্রিগার করা হচ্ছে
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 4000); // ৪ সেকেন্ড পর টোস্টটি চলে যাবে
+
         setTitle(''); setShortDesc(''); setFullDesc(''); setPrice(''); setImageUrl(''); setTagsInput('');
+        setCategory('shirt'); // ফর্ম রিসেট হওয়ার পর ডিফল্ট ক্যাটাগরি আবার সেট করা হলো
         fetchItems();
       } else {
         const errData = await res.json();
-        setError(errData.error || 'Failed to register the fabric item.');
+        toast.error(errData.error || 'Failed to register the fabric item.');
       }
     } catch (err) {
-      setError('Server unreachable. Could not add item.');
+      toast.error('Server unreachable. Could not add item.');
     }
   };
 
   const handleDeleteItem = async (itemId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/items/${itemId}`, { method: 'DELETE' });
+      const res = await fetch(`${SERVER_URL}/api/items/${itemId}`, { method: 'DELETE' });
       if (res.ok) {
-        setSuccess('Fabric removed successfully!');
+        toast.success('Fabric removed successfully!');
         fetchItems();
       }
     } catch (err) {
-      setError('Server error while deleting.');
+      toast.error('Server error while deleting.');
     }
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 bg-zinc-950 text-zinc-50 space-y-12">
+    <div className="relative mx-auto max-w-7xl px-6 py-12 lg:px-8 bg-zinc-950 text-zinc-50 space-y-12">
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-zinc-900 px-5 py-4 shadow-2xl shadow-emerald-950/20 animate-in fade-in slide-in-from-bottom-5 duration-300">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 text-sm font-bold">
+            ✓
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">Product added successfully</p>
+            <p className="text-xs text-zinc-400 mt-0.5">Inventory cache updated live.</p>
+          </div>
+        </div>
+      )}
 
       {/* Dashboard Header */}
       <div className="border-b border-white/5 pb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -191,11 +217,13 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-1">Category</label>
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl bg-zinc-950 border border-white/10 px-3 py-2 text-sm text-zinc-300 focus:outline-none">
-                    <option value="cotton">Cotton</option>
-                    <option value="linen">Linen</option>
-                    <option value="silk">Silk</option>
-                    <option value="accessories">Accessories</option>
+                  {/* আপডেট করা ড্রপডাউন অপশনসমূহ */}
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl bg-zinc-950 border border-white/10 px-3 py-2 text-sm text-zinc-300 focus:outline-none cursor-pointer">
+                    <option value="shirt">Shirt</option>
+                    <option value="pant">Pant</option>
+                    <option value="panjabi">Panjabi</option>
+                    <option value="t-shirt">T-shirt</option>
+                    <option value="others">Others</option>
                   </select>
                 </div>
                 <div>
@@ -225,25 +253,43 @@ export default function Dashboard() {
         </div>
 
         {/* Right Active Inventory */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white">Active Inventory ({products.length})</h2>
-            <button onClick={fetchItems} className="text-xs text-brand-cyan font-medium cursor-pointer">🔄 Refresh Inventory</button>
+            <h2 className="text-base font-bold text-white">Active Inventory ({products.length})</h2>
+            <button onClick={fetchItems} className="text-[11px] text-brand-cyan font-medium cursor-pointer hover:underline">
+              🔄 Refresh
+            </button>
           </div>
+
           {loading ? (
-            <div className="text-center py-10 text-zinc-500">Querying active rolls...</div>
+            <div className="text-center py-6 text-xs text-zinc-500">Querying active rolls...</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {products.map((item) => (
-                <div key={item.id} className="rounded-2xl bg-zinc-900/40 border border-white/5 p-4 flex flex-col justify-between">
-                  <div>
-                    <span className="rounded bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] uppercase text-zinc-400">{item.category}</span>
-                    <h3 className="text-sm font-bold text-white mt-1 line-clamp-1">{item.title}</h3>
-                    <p className="text-zinc-400 text-xs line-clamp-1 mt-1">{item.shortDescription}</p>
+                <div
+                  key={item.id}
+                  className="rounded-xl bg-zinc-900/40 border border-white/5 p-2.5 flex items-center justify-between gap-3 hover:border-white/10 transition-colors"
+                >
+                  {/* Product Left Info */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="shrink-0 rounded bg-white/5 border border-white/10 px-1 py-0.2 text-[9px] uppercase font-medium text-zinc-400">
+                        {item.category}
+                      </span>
+                      <h3 className="text-xs font-bold text-white truncate">{item.title}</h3>
+                    </div>
+                    <p className="text-zinc-500 text-[11px] truncate">{item.shortDescription}</p>
                   </div>
-                  <div className="border-t border-white/5 pt-3 mt-3 flex items-center justify-between">
+
+                  {/* Product Right Actions */}
+                  <div className="shrink-0 flex items-center gap-3 pl-2 border-l border-white/5">
                     <span className="text-xs font-bold text-brand-cyan">${item.price.toFixed(2)}/yd</span>
-                    <button onClick={() => handleDeleteItem(item.id)} className="rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1 text-xs font-semibold transition-all">Delete</button>
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="rounded-md border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2 py-1 text-[10px] font-medium transition-all cursor-pointer"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

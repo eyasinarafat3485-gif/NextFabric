@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+// Fixed: Icons must be imported from their specific icon set sub-folders (like /fa)
+import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -155,7 +157,10 @@ export default function ContactPage() {
 
                         <div className="space-y-8">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-2xl">📍</div>
+                                {/* Changed: Replaced emoji with FaMapMarkerAlt */}
+                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-xl text-violet-400">
+                                    <FaMapMarkerAlt />
+                                </div>
                                 <div>
                                     <p className="font-medium">Address</p>
                                     <p className="text-zinc-400">Dhaka, Bangladesh</p>
@@ -163,7 +168,10 @@ export default function ContactPage() {
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-2xl">📧</div>
+                                {/* Changed: Replaced emoji with FaEnvelope */}
+                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-xl text-violet-400">
+                                    <FaEnvelope />
+                                </div>
                                 <div>
                                     <p className="font-medium">Email</p>
                                     <a href="mailto:support@nextfabric.com" className="text-violet-400 hover:underline">
@@ -173,7 +181,10 @@ export default function ContactPage() {
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-2xl">📞</div>
+                                {/* Kept: Existing FaPhoneAlt element layout */}
+                                <div className="w-12 h-12 bg-zinc-800 rounded-xl flex items-center justify-center text-xl text-violet-400">
+                                    <FaPhoneAlt />
+                                </div>
                                 <div>
                                     <p className="font-medium">Phone</p>
                                     <a href="tel:+8801712345678" className="text-violet-400 hover:underline">

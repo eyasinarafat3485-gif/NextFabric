@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { FALLBACK_PRODUCTS } from '../page';
+
+// বিল্ড এরর ফিক্স করার জন্য লোকাল ফলব্যাক ডিফাইন করা হলো
+const FALLBACK_PRODUCTS = [];
 
 export default function ProductDetails({ params }) {
   // Unwrap parameters using React.use() as standard in modern Next.js
@@ -78,11 +80,8 @@ export default function ProductDetails({ params }) {
 
   const totalPrice = product.price * yards;
 
-  // Function to handle database purchase submission
-  // ... বাকি স্টেট এবং useEffect আগের মতোই থাকবে ...
-
   const handleBuyProduct = async () => {
-    // LocalStorage থেকে কারেন্ট লগইন করা ইউজার অবজেক্ট নেওয়া হচ্ছে
+    // LocalStorage থেকে কারেন্ট লগইন করা ইউজার অবজেক্ট নেওয়া হচ্ছে
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
       toast.error('Please log in first to purchase fabrics.');
@@ -124,8 +123,6 @@ export default function ProductDetails({ params }) {
       setBuying(false);
     }
   };
-
-  // ... রিটার্ন ব্লক বা রেন্ডারিং আগের মতোই থাকবে ...
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 bg-zinc-950 text-zinc-50">
