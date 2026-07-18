@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { signIn, signUp } from '@/app/lib/auth-client';
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please fill in all credentials.');
+      toast.error('Please fill in all credentials.');
       return;
     }
     setError('');
@@ -28,9 +29,9 @@ export default function Login() {
       });
 
       if (authError) {
-        setError(authError.message || 'Failed to sign in. Please verify credentials.');
+        toast.error(authError.message || 'Failed to sign in. Please verify credentials.');
       } else {
-        setSuccess('Logged in successfully! Redirecting...');
+        toast.success('Logged in successfully!');
         if (data && data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }
@@ -40,7 +41,7 @@ export default function Login() {
       }
     } catch (err) {
       console.error('Sign in error:', err);
-      setError('An unexpected error occurred during sign in.');
+      toast.error('An unexpected error occurred during sign in.');
     } finally {
       setLoading(false);
     }
@@ -63,7 +64,7 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setSuccess('Authenticated as Demo User! Establishing session...');
+        toast.success('Authenticated as Demo User! Establishing session...');
         const emailVal = data.credentials.email;
         const passwordVal = data.credentials.password;
         
@@ -89,7 +90,7 @@ export default function Login() {
           }
 
           localStorage.setItem('user', JSON.stringify(data.user));
-          setSuccess('Demo session active! Redirecting...');
+          toast.success('Demo session active! Redirecting...');
           setTimeout(() => {
             window.location.href = '/shop';
           }, 1500);
@@ -103,7 +104,7 @@ export default function Login() {
     } catch (err) {
       console.error('Demo login connection error:', err);
       // Fallback for offline mode so user can still test the UI
-      setSuccess('Demo Login (Offline Mode simulation successful)! Redirecting...');
+      toast.success('Demo Login (Offline Mode simulation successful)! Redirecting...');
       localStorage.setItem('user', JSON.stringify({ name: 'Demo User', email: 'demo@example.com' }));
       setTimeout(() => {
         window.location.href = '/shop';

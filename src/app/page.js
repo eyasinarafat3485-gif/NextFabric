@@ -265,17 +265,12 @@ export default function Home() {
             </p>
             <div className="pt-4 flex flex-wrap gap-4">
               <Link
-                href="/shop/heritage-linen"
+                href="/shop"
                 className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 transition-colors"
               >
                 Shop Heritage Collection
               </Link>
-              <Link
-                href="/swatches/request?pack=heritage"
-                className="rounded-xl border border-white/10 bg-zinc-900/80 px-5 py-3 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 transition-all"
-              >
-                Request Swatch Pack
-              </Link>
+             
             </div>
           </div>
         </div>

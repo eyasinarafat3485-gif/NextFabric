@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut, signIn, signUp } from "@/app/lib/auth-client";
+import { toast } from 'react-toastify';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,12 +55,14 @@ export default function Navbar() {
   const handleSignOut = async () => {
     try {
       await signOut();
+      toast.success("User logged out")
     } catch (err) {
       console.error('Error signing out:', err);
     }
     localStorage.removeItem('user');
     localStorage.removeItem('session');
     window.location.href = '/';
+    toast.warning("User logged out")
   };
 
   // Determine dynamic roles on client mount
