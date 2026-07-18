@@ -109,7 +109,7 @@ export default function ProductDetails({ params }) {
       });
 
       if (res.ok) {
-        toast.success(`Purchase successful! Dynamic collection updated.`);
+        toast.success(`Purchase successful done!`);
         setTimeout(() => {
           window.location.replace('/collection');
         }, 1200);
