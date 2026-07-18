@@ -119,7 +119,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 2: FEATURES SECTION                          */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 border-t border-white/5">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Crafted for Unmatched Quality
@@ -182,7 +182,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 3: CATEGORIES GRID                           */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 border-t border-white/5">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Curated Collections by Use Case
@@ -284,7 +284,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 5: STATISTICS / MILESTONES                   */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 border-t border-white/5">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             {
@@ -319,7 +319,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 6: TESTIMONIALS                              */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 border-t border-white/5">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Trusted by the Design Community
@@ -368,7 +368,7 @@ export default function Home() {
                 </blockquote>
               </div>
 
-              <div className="border-t border-white/5 pt-4 flex items-center gap-3">
+              <div className=" pt-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-brand-indigo/10 flex items-center justify-center border border-brand-indigo/20 font-bold text-sm text-brand-cyan">
                   {t.author.charAt(0)}
                 </div>
@@ -385,7 +385,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 7: NEWSLETTER                                */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 border-t border-white/5">
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
         <div className="relative overflow-hidden rounded-2xl bg-zinc-900/40 border border-white/5 px-6 py-16 text-center shadow-2xl sm:px-12 sm:py-20 lg:px-20">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(6,182,212,0.06),transparent_50%)] pointer-events-none" />
 
