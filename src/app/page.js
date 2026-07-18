@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
 export default function Home() {
   // Section 1: Hero Text Cycling Animation State
   const fabricWords = ['Organic Cottons', 'Pure Linens', 'Luxury Silks', 'Structured Woolens'];
@@ -19,6 +21,40 @@ export default function Home() {
     }, 3500);
 
     return () => clearInterval(timer);
+  }, []);
+
+  // Trending Products State
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
+
+  // Fetching Trending Products (Recent 4 Items) from Express Backend
+  useEffect(() => {
+    async function fetchTrendingItems() {
+      try {
+        const res = await fetch(`${SERVER_URL}/api/items`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            // আইডি বা তৈরি হওয়ার সময় অনুযায়ী সর্ট করে প্রথম ৪টি (সবচেয়ে সাম্প্রতিক) আইটেম নেওয়া হলো
+            const mappedData = data
+              .map(item => ({
+                ...item,
+                id: item._id || item.id,
+                category: item.category ? item.category.toLowerCase() : 'others',
+              }))
+              .sort((a, b) => b.id.toString().localeCompare(a.id.toString()))
+              .slice(0, 4);
+
+            setTrendingProducts(mappedData);
+          }
+        }
+      } catch (err) {
+        console.log('Express backend not reachable for trending items.', err);
+      } finally {
+        setTrendingLoading(false);
+      }
+    }
+    fetchTrendingItems();
   }, []);
 
   // Section 5: Statistics Counter Animation State
@@ -117,9 +153,76 @@ export default function Home() {
       </section>
 
       {/* ---------------------------------------------------- */}
+      {/* NEW SECTION: TRENDING PRODUCTS                       */}
+      {/* ---------------------------------------------------- */}
+      <section className="mx-auto max-w-7xl px-6 pt-23  lg:px-8 ">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Trending Products
+            </h2>
+            <p className="mt-2 text-sm text-zinc-400">
+              Explore our most recent premium fabric releases.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="rounded-xl bg-zinc-900 border border-white/10 hover:border-brand-cyan px-5 py-2.5 text-sm font-semibold text-brand-cyan transition-all shrink-0"
+          >
+            View All Products &rarr;
+          </Link>
+        </div>
+
+        {trendingLoading ? (
+          <div className="text-center py-20 text-zinc-500">Loading trending products...</div>
+        ) : trendingProducts.length === 0 ? (
+          <div className="text-center py-20 border border-white/5 rounded-2xl bg-zinc-900/20">
+            <p className="text-zinc-400 text-lg">No trending products found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {trendingProducts.map((product) => (
+              <div
+                key={product.id}
+                className="glow-border group relative rounded-2xl bg-zinc-900/40 border border-white/5 overflow-hidden flex flex-col justify-between"
+              >
+                <div className="aspect-w-4 aspect-h-3 bg-zinc-950 overflow-hidden relative h-56">
+                  <img
+                    src={product.imageUrl}
+                    alt={product.title}
+                    className="object-cover h-full w-full opacity-80 group-hover:opacity-100 transition-all duration-300"
+                  />
+                </div>
+
+                <div className="p-6 flex-grow flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <h2 className="text-lg font-bold text-white line-clamp-1">{product.title}</h2>
+                    <p className="text-zinc-400 text-xs line-clamp-2">{product.shortDescription}</p>
+                  </div>
+
+                  <div className="mt-4 text-sm font-semibold text-white">
+                    ${product.price.toFixed(2)}<span className="text-xs text-zinc-500 font-normal"> / yard</span>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link
+                      href={`/shop/${product.id}`}
+                      className="w-full rounded-xl bg-gradient-to-r from-brand-indigo to-brand-cyan py-2 text-xs font-semibold text-white text-center transition-all cursor-pointer"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ---------------------------------------------------- */}
       {/* SECTION 2: FEATURES SECTION                          */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
+      <section className="mx-auto max-w-7xl px-6 pt-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Crafted for Unmatched Quality
@@ -249,11 +352,11 @@ export default function Home() {
       {/* SECTION 4: VISUAL HIGHLIGHTS / DYNAMIC BANNER        */}
       {/* ---------------------------------------------------- */}
       <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/40 border border-white/5 px-6 py-20 shadow-2xl sm:px-12 sm:py-24 lg:px-20">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/40 border border-white/5 px-6 py-15 shadow-2xl sm:px-12 sm:py-24 lg:px-20">
           {/* Neon radial mesh glow */}
           <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-gradient-to-br from-brand-indigo/25 to-brand-cyan/25 blur-3xl pointer-events-none" />
 
-          <div className="relative mx-auto max-w-3xl space-y-6">
+          <div className="relative mx-auto space-y-6">
             <span className="text-xs font-semibold tracking-widest text-brand-cyan uppercase">
               Limited Swatch Series
             </span>
@@ -270,7 +373,6 @@ export default function Home() {
               >
                 Shop Heritage Collection
               </Link>
-             
             </div>
           </div>
         </div>
@@ -350,7 +452,6 @@ export default function Home() {
           ].map((t, idx) => (
             <div key={idx} className="glow-border relative rounded-2xl bg-zinc-900/40 p-8 flex flex-col justify-between">
               <div>
-                {/* Five Star rating */}
                 <div className="flex gap-1 mb-6 text-brand-cyan">
                   {[...Array(t.rating)].map((_, i) => (
                     <svg key={i} className="h-5 w-5 fill-current" viewBox="0 0 20 20">
