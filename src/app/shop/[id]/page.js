@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 import { FALLBACK_PRODUCTS } from '../page';
 
 export default function ProductDetails({ params }) {
@@ -10,14 +11,13 @@ export default function ProductDetails({ params }) {
 
   const [product, setProduct] = useState(null);
   const [yards, setYards] = useState(2); // Default to 2 yards
-  const [cartSuccess, setCartSuccess] = useState(false);
-  const [swatchSuccess, setSwatchSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [buying, setBuying] = useState(false);
 
   useEffect(() => {
     // 1. First search in local fallback catalog
     const localProduct = FALLBACK_PRODUCTS.find(p => p.id === id);
-    
+
     if (localProduct) {
       setProduct(localProduct);
       setLoading(false);
@@ -34,6 +34,7 @@ export default function ProductDetails({ params }) {
             setProduct({
               ...liveProduct,
               id: liveProduct._id || liveProduct.id,
+              category: liveProduct.category || 'cotton',
               specs: liveProduct.specs || {
                 composition: 'Custom Weave Blend',
                 weight: 'Varying GSM',
@@ -77,23 +78,62 @@ export default function ProductDetails({ params }) {
 
   const totalPrice = product.price * yards;
 
-  const handleAddToCart = () => {
-    setCartSuccess(true);
-    setTimeout(() => setCartSuccess(false), 3000);
+  // Function to handle database purchase submission
+  // ... বাকি স্টেট এবং useEffect আগের মতোই থাকবে ...
+
+  const handleBuyProduct = async () => {
+    // LocalStorage থেকে কারেন্ট লগইন করা ইউজার অবজেক্ট নেওয়া হচ্ছে
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      toast.error('Please log in first to purchase fabrics.');
+      return;
+    }
+
+    const loggedInUser = JSON.parse(storedUser);
+    const userEmail = loggedInUser.email; // ডাইনামিক ইউজারের ইমেইল
+
+    setBuying(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/user-collection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail, // ব্যাকএন্ডে ইউজারের ইমেইল পাঠানো হচ্ছে
+          itemId: product.id,
+          title: product.title,
+          shortDescription: product.shortDescription,
+          price: totalPrice,
+          imageUrl: product.imageUrl,
+        }),
+      });
+
+      if (res.ok) {
+        toast.success(`Purchase successful! Dynamic collection updated.`);
+        setTimeout(() => {
+          window.location.replace('/collection');
+        }, 1200);
+      } else {
+        toast.error('Failed to register this roll under your account.');
+      }
+    } catch (err) {
+      console.error('Error connecting to endpoint', err);
+      toast.error('Server offline. Dynamic buy simulation failed.');
+    } finally {
+      setBuying(false);
+    }
   };
 
-  const handleRequestSwatch = () => {
-    setSwatchSuccess(true);
-    setTimeout(() => setSwatchSuccess(false), 3000);
-  };
+  // ... রিটার্ন ব্লক বা রেন্ডারিং আগের মতোই থাকবে ...
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 bg-zinc-950 text-zinc-50">
-      
+
       {/* Back button */}
       <div className="mb-8">
-        <Link 
-          href="/shop" 
+        <Link
+          href="/shop"
           className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors"
         >
           &larr; Back to Fabric Catalog
@@ -101,28 +141,20 @@ export default function ProductDetails({ params }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-        
+
         {/* Left Column: Image preview */}
         <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/5 h-[400px] sm:h-[500px]">
           <img
             src={product.imageUrl}
             alt={product.title}
             className="w-full h-full object-cover opacity-90"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
           />
-          {/* Fallback pattern preview */}
-          <div className="hidden absolute inset-0 bg-gradient-to-br from-brand-indigo/15 to-brand-cyan/20 flex flex-col items-center justify-center text-zinc-500 font-semibold tracking-wider text-sm">
-            Zoomed Thread View
-          </div>
         </div>
 
         {/* Right Column: Specifications & Pricing */}
         <div className="flex flex-col justify-between space-y-8">
           <div className="space-y-6">
-            
+
             {/* Tags and Title */}
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
@@ -162,19 +194,19 @@ export default function ProductDetails({ params }) {
               <div className="grid grid-cols-2 gap-4 border border-white/5 rounded-2xl p-6 bg-zinc-900/20">
                 <div>
                   <div className="text-xs text-zinc-500">Composition</div>
-                  <div className="text-sm text-zinc-200 font-medium">{product.specs.composition}</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs?.composition}</div>
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">GSM Weight</div>
-                  <div className="text-sm text-zinc-200 font-medium">{product.specs.weight}</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs?.weight}</div>
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">Roll Width</div>
-                  <div className="text-sm text-zinc-200 font-medium">{product.specs.width}</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs?.width}</div>
                 </div>
                 <div>
                   <div className="text-xs text-zinc-500">Mill Origin</div>
-                  <div className="text-sm text-zinc-200 font-medium">{product.specs.origin}</div>
+                  <div className="text-sm text-zinc-200 font-medium">{product.specs?.origin}</div>
                 </div>
               </div>
             </div>
@@ -183,7 +215,7 @@ export default function ProductDetails({ params }) {
 
           {/* Sizing & Actions */}
           <div className="space-y-6 pt-6 border-t border-white/5">
-            
+
             {/* Yardage Selector */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -222,33 +254,14 @@ export default function ProductDetails({ params }) {
               <span className="text-xl font-bold text-brand-cyan">${totalPrice.toFixed(2)}</span>
             </div>
 
-            {/* Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={handleAddToCart}
-                className="w-full rounded-xl bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 px-6 py-4 text-sm font-semibold text-white shadow-lg transition-all cursor-pointer"
-              >
-                Add To Design Cart
-              </button>
-              <button
-                onClick={handleRequestSwatch}
-                className="w-full rounded-xl border border-white/10 bg-zinc-900 hover:bg-zinc-800 px-6 py-4 text-sm font-semibold text-zinc-300 transition-colors cursor-pointer"
-              >
-                Request Swatch Preview
-              </button>
-            </div>
-
-            {/* Success notifications */}
-            {cartSuccess && (
-              <div className="rounded-xl border border-brand-cyan/20 bg-brand-cyan/5 p-3 text-brand-cyan text-xs font-medium text-center animate-fade-in">
-                ✓ Yards added to your active design workspace cart!
-              </div>
-            )}
-            {swatchSuccess && (
-              <div className="rounded-xl border border-brand-indigo/20 bg-brand-indigo/5 p-3 text-brand-indigo text-xs font-medium text-center animate-fade-in">
-                ✓ Swatch sample request added. Swatch cards ship free!
-              </div>
-            )}
+            {/* Single Action Button */}
+            <button
+              onClick={handleBuyProduct}
+              disabled={buying}
+              className="w-full rounded-xl bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 px-6 py-4 text-sm font-semibold text-white shadow-lg transition-all cursor-pointer text-center disabled:opacity-50"
+            >
+              {buying ? 'Processing Order...' : 'Buy & Add to Collection'}
+            </button>
 
           </div>
 

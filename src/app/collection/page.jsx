@@ -6,12 +6,22 @@ import Link from 'next/link';
 export default function MyCollection() {
     const [savedItems, setSavedItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [userEmail, setUserEmail] = useState('');
 
-    // (৩) Fetch custom user collections from backend DB
     useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+            setLoading(false);
+            return;
+        }
+
+        const loggedInUser = JSON.parse(storedUser);
+        setUserEmail(loggedInUser.email);
+
+        // ২. শুধুমাত্র ওই ইউজারের ইমেইল কুয়েরি প্যারামিটার দিয়ে ডেটা ফেচ করা
         async function fetchUserCollection() {
             try {
-                const res = await fetch('http://localhost:5000/api/user-collection');
+                const res = await fetch(`http://localhost:5000/api/user-collection?email=${loggedInUser.email}`);
                 if (res.ok) {
                     const data = await res.json();
                     setSavedItems(data);
@@ -22,11 +32,12 @@ export default function MyCollection() {
                 setLoading(false);
             }
         }
+
         fetchUserCollection();
     }, []);
 
     return (
-        <div className="min-h-screen bg-zinc-950 px-6 py-12 lg:px-8 text-zinc-50">
+        <div className="min-h-screen bg-zinc-900 px-6 py-12 lg:px-8 text-zinc-50">
             <div className="mx-auto max-w-7xl">
 
                 {/* Header section */}
@@ -34,7 +45,7 @@ export default function MyCollection() {
                     <div>
                         <h1 className="text-4xl font-extrabold tracking-tight">My Fabric Collection</h1>
                         <p className="text-zinc-400 text-sm mt-2">
-                            Your dynamically acquired catalog rolls and private hardware stash synced to the DB vault.
+                            Private workspace vault for: <span className="text-brand-cyan font-mono">{userEmail || 'Guest'}</span>
                         </p>
                     </div>
                     <Link
@@ -48,9 +59,18 @@ export default function MyCollection() {
                 {/* Dynamic Display area */}
                 {loading ? (
                     <div className="text-center py-20 text-zinc-500">Retrieving your personal database vault...</div>
-                ) : savedItems.length === 0 ? (
+                ) : !userEmail ? (
+                    // ইউজার লগইন না থাকলে ওয়ার্নিং
                     <div className="text-center py-20 border border-white/5 rounded-2xl bg-zinc-950/20">
-                        <p className="text-zinc-400 text-base">You haven't bought or added any fabric styles yet.</p>
+                        <p className="text-red-400 text-base">⚠️ Please login to view your personalized fabric stash.</p>
+                        <Link href="/login" className="mt-4 inline-block text-sm font-bold text-brand-indigo hover:underline">
+                            Go to Login Page
+                        </Link>
+                    </div>
+                ) : savedItems.length === 0 ? (
+
+                    <div className="text-center py-20 border border-white/5 rounded-2xl bg-zinc-950/20">
+                        <p className="text-zinc-400 text-base">No fabrics found in your private collection.</p>
                         <Link
                             href="/shop"
                             className="mt-4 inline-block text-sm font-bold text-brand-cyan hover:underline"
@@ -59,18 +79,29 @@ export default function MyCollection() {
                         </Link>
                     </div>
                 ) : (
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {savedItems.map((item) => (
                             <div
                                 key={item._id || item.id}
-                                className="group rounded-2xl bg-zinc-950 border border-white/5 overflow-hidden flex flex-col justify-between p-4"
+                                className="group rounded-2xl bg-zinc-950 border border-white/5 overflow-hidden flex flex-col justify-between p-4 relative"
                             >
-                                <div className="h-48 w-full overflow-hidden rounded-xl bg-zinc-900">
+
+                                <div className="h-48 w-full overflow-hidden rounded-xl bg-zinc-900 relative">
                                     <img
                                         src={item.imageUrl}
                                         alt={item.title}
                                         className="object-cover w-full h-full opacity-90 group-hover:opacity-100 transition-opacity"
                                     />
+
+                                    <div className="absolute top-3 right-3">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border backdrop-blur-sm ${item.status === 'Confirmed'
+                                            ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                            }`}>
+                                            {item.status || 'Pending'}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className="mt-4 flex-grow space-y-2">
