@@ -443,7 +443,7 @@ export default function Dashboard() {
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
                           <Link
-                            href={`/shop/${fabricProductId}`} // 👈 ডেস্কটপ ভিউতে অরিজিনাল ফিক্সড রাউট
+                            href={`/shop/${order.fabricId}`} // 👈 ডেস্কটপ ভিউতে অরিজিনাল ফিক্সড রাউট
                             className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors inline-block"
                           >
                             View
