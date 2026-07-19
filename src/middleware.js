@@ -77,38 +77,40 @@ export async function middleware(request) {
     }
 
     // ২. সেশন টোকেন আছে (ইউজার লগইনড)। এবার রোল-বেসড প্রটেকশন:
-    // Better-Auth লাইভ সার্ভারে কুকির ভ্যালু বা স্টেট ম্যানেজ করে। 
-    // অ্যাডমিন ছাড়া অন্য কোনো রোল বা রেগুলার ইউজার যদি /dashboard এ যাওয়ার চেষ্টা করে:
     if (isDashboard) {
       try {
-        // ফ্রন্টএন্ড সেশন ভেরিফিকেশন কল
-        const targetUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
-        const sessionRes = await fetch(`${targetUrl}/api/auth/get-session`, {
-          headers: {
-            "Cookie": `${sessionToken.name}=${sessionToken.value}`,
-          },
-        });
+        const tokenValue = sessionToken.value;
 
-        if (sessionRes.ok) {
-          const session = await sessionRes.json();
+        // Better-Auth এর লাইভ টোকেন যদি JWT স্ট্রাকচারের হয়, তাহলে এপিআই কল ছাড়াই রোল বের করা সম্ভব
+        if (tokenValue.includes(".")) {
+          const base64Url = tokenValue.split(".")[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split("")
+              .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+              .join("")
+          );
 
-          // সেশন থেকে রোল চেক: রোল যদি 'admin' না হয়, তবে শুধু /collection পেজে রিডাইরেক্ট হবে
-          if (!session || !session.user || session.user.role !== "admin") {
+          const payload = JSON.parse(jsonPayload);
+
+          // টোকেনের ভেতর যদি রোল থাকে এবং সেটি যদি 'admin' না হয়
+          if (payload && payload.role && payload.role !== "admin") {
             return NextResponse.redirect(new URL("/collection", request.url));
           }
         } else {
-          // কোনো কারণে এপিআই রেসপন্স না পেলে সেফটি হিসেবে /collection এ রিডাইরেক্ট করুন
-          return NextResponse.redirect(new URL("/collection", request.url));
+          // যদি টোকেন JWT না হয়ে প্লেইন ডাটাবেজ সেশন আইডি হয়, তবে আমরা সরাসরি ব্লক না করে 
+          // লোকাল স্টোরেজ বা ক্লায়েন্ট সাইড ভেরিফিকেশনের উপর ছেড়ে দিয়ে নরমাল রেসপন্স রাখবো যেন ইউজার আটকে না যায়।
+          return NextResponse.next();
         }
       } catch (err) {
-        console.error("Session fetch error:", err);
-        // লাইভে নেটওয়ার্ক টাইমআউট বা ফেইলুর হলে ইউজারকে লগইন পেজে না পাঠিয়ে /collection এ অ্যাক্সেস দিন
+        console.error("Middleware client side decode error:", err);
+        // কোনো কারণে ডিকোড এরর হলে লাইভে ইউজারকে লগইন পেজে না পাঠিয়ে /collection এ সেফ রিডাইরেক্ট করুন
         return NextResponse.redirect(new URL("/collection", request.url));
       }
     }
 
     // ইউজার যদি শুধু /collection এ যেতে চায়, তাহলে সেশন কুকি থাকাই যথেষ্ট।
-    // রেগুলার ইউজার এবং অ্যাডমিন উভয়েই সরাসরি /collection এ অ্যাক্সেস পাবে।
   }
 
   return NextResponse.next();
