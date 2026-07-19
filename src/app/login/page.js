@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { signIn, signUp } from '@/app/lib/auth-client';
 import { toast } from 'react-toastify';
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;    
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -116,7 +116,6 @@ export default function Login() {
       toast.success('Demo Login Successful! Redirecting...');
       setSuccess('Demo Login Successful! Redirecting...');
 
-      // window.location.replace ব্যবহার করলে রাউটার হিস্ট্রি ক্লিন হয়ে সরাসরি পেজ লোড নেয়
       setTimeout(() => {
         window.location.replace('/shop');
       }, 1000);
@@ -187,17 +186,27 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl mt-10  bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-indigo/10 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="w-full rounded-xl mt-6 bg-gradient-to-r from-brand-indigo to-brand-cyan hover:opacity-90 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-indigo/10 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             {loading ? 'Verifying...' : 'Sign In'}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="relative flex items-center justify-center my-4">
+        <div className="relative flex items-center justify-center my-2">
           <div className="absolute inset-x-0 h-px bg-white/5" />
           <span className="relative bg-zinc-900 px-3 text-xs text-zinc-500 uppercase tracking-wider">or</span>
         </div>
+
+        {/* Demo Login Button */}
+        <button
+          type="button"
+          disabled={loading}
+          onClick={handleDemoLogin}
+          className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800/80 py-3 text-sm font-semibold text-zinc-300 transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          {loading ? 'Processing...' : 'Access Demo Space'}
+        </button>
 
         {/* Bottom Link */}
         <p className="text-center text-xs text-zinc-500 pt-2">
