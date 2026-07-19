@@ -16,6 +16,8 @@ export default function ProductDetails({ params }) {
   const [yards, setYards] = useState(2); // Default to 2 yards
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
 
   useEffect(() => {
     // 1. First search in local fallback catalog
@@ -24,20 +26,42 @@ export default function ProductDetails({ params }) {
     if (localProduct) {
       setProduct(localProduct);
       setLoading(false);
+      const related = FALLBACK_PRODUCTS.filter(p => p.category === localProduct.category && p.id !== localProduct.id);
+      setRelatedProducts(related);
+      setRelatedLoading(false);
     }
 
     // 2. Also try fetching live product from Express database
     async function fetchLiveProduct() {
       try {
+        setRelatedLoading(true);
         const res = await fetch(`${SERVER_URL}/api/items`);
         if (res.ok) {
           const data = await res.json();
           const liveProduct = data.find(p => (p._id === id || p.id === id));
           if (liveProduct) {
+            // Determine current product category dynamically
+            let detectedCategory = 'others';
+            if (liveProduct.category) {
+              detectedCategory = String(liveProduct.category).toLowerCase();
+            } else {
+              const searchStr = `${(liveProduct.tags || []).join(' ')} ${liveProduct.title || ''} ${liveProduct.shortDescription || ''} ${liveProduct.fullDescription || ''}`.toLowerCase();
+              if (searchStr.includes('t-shirt') || searchStr.includes('tshirt') || searchStr.includes('jersey') || searchStr.includes('pique knit') || searchStr.includes('polo')) {
+                detectedCategory = 't-shirt';
+              } else if (searchStr.includes('panjabi')) {
+                detectedCategory = 'panjabi';
+              } else if (searchStr.includes('pant') || searchStr.includes('trousers') || searchStr.includes('slacks') || searchStr.includes('jeans') || searchStr.includes('gabardine')) {
+                detectedCategory = 'pant';
+              } else if (searchStr.includes('shirt') || searchStr.includes('shirting') || searchStr.includes('linen')) {
+                detectedCategory = 'shirt';
+              }
+            }
+
+            const currentId = liveProduct._id || liveProduct.id;
             setProduct({
               ...liveProduct,
-              id: liveProduct._id || liveProduct.id,
-              category: liveProduct.category || 'cotton',
+              id: currentId,
+              category: detectedCategory,
               specs: liveProduct.specs || {
                 composition: 'Custom Weave Blend',
                 weight: 'Varying GSM',
@@ -45,12 +69,42 @@ export default function ProductDetails({ params }) {
                 origin: 'Sourced Mill',
               }
             });
+
+            // Filter related products
+            const mappedData = data.map(item => {
+              let categoryVal = 'others';
+              if (item.category) {
+                categoryVal = String(item.category).toLowerCase();
+              } else {
+                const searchStr = `${(item.tags || []).join(' ')} ${item.title || ''} ${item.shortDescription || ''} ${item.fullDescription || ''}`.toLowerCase();
+                if (searchStr.includes('t-shirt') || searchStr.includes('tshirt') || searchStr.includes('jersey') || searchStr.includes('pique knit') || searchStr.includes('polo')) {
+                  categoryVal = 't-shirt';
+                } else if (searchStr.includes('panjabi')) {
+                  categoryVal = 'panjabi';
+                } else if (searchStr.includes('pant') || searchStr.includes('trousers') || searchStr.includes('slacks') || searchStr.includes('jeans') || searchStr.includes('gabardine')) {
+                  categoryVal = 'pant';
+                } else if (searchStr.includes('shirt') || searchStr.includes('shirting') || searchStr.includes('linen')) {
+                  categoryVal = 'shirt';
+                }
+              }
+              return {
+                ...item,
+                id: item._id || item.id,
+                category: categoryVal,
+                title: item.title ? String(item.title) : '',
+                shortDescription: item.shortDescription ? String(item.shortDescription) : '',
+              };
+            });
+
+            const related = mappedData.filter(p => p.category === detectedCategory && p.id !== currentId);
+            setRelatedProducts(related);
           }
         }
       } catch (err) {
         console.log('Unable to reach live Express server for dynamic product ID:', id);
       } finally {
         setLoading(false);
+        setRelatedLoading(false);
       }
     }
     fetchLiveProduct();
@@ -267,6 +321,59 @@ export default function ProductDetails({ params }) {
 
       </div>
 
+      {/* Related Products Section */}
+      <div className="mt-20 border-t border-white/5 pt-12">
+        <h2 className="text-2xl font-bold tracking-tight text-white mb-8">
+          Related Products
+        </h2>
+        {relatedLoading ? (
+          <div className="text-center py-20 text-zinc-500">Loading catalog...</div>
+        ) : relatedProducts.length === 0 ? (
+          <div className="text-center py-20 border border-white/5 rounded-2xl bg-zinc-900/20">
+            <p className="text-zinc-400 text-lg">No related products found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {relatedProducts.map((p) => (
+              <div
+                key={p.id}
+                className="glow-border group relative rounded-2xl bg-zinc-900/40 border border-white/5 overflow-hidden flex flex-col justify-between"
+              >
+                <div className="aspect-w-4 aspect-h-3 bg-zinc-950 overflow-hidden relative h-56">
+                  <img
+                    src={p.imageUrl}
+                    alt={p.title}
+                    className="object-cover h-full w-full opacity-80 group-hover:opacity-100 transition-all duration-300"
+                  />
+                </div>
+
+                <div className="p-6 flex-grow flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <h2 className="text-lg font-bold text-white line-clamp-1">{p.title}</h2>
+                    <p className="text-zinc-400 text-xs line-clamp-2">{p.shortDescription}</p>
+                  </div>
+
+                  <div className="mt-4 text-sm font-semibold text-white">
+                    ${Number(p.price).toFixed(2)}<span className="text-xs text-zinc-500 font-normal"> / yard</span>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link
+                      href={`/shop/${p.id}`}
+                      className="w-full rounded-xl bg-gradient-to-r from-brand-indigo to-brand-cyan py-2 text-xs font-semibold text-white text-center transition-all cursor-pointer"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
+
+
