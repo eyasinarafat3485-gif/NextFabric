@@ -368,10 +368,13 @@ export default function Dashboard() {
           </div>
         ) : (
           <div>
-            {/* 📱 MOBILE VIEW: মোবাইলে স্ক্রোলিং এড়াতে কার্ড লেআউট */}
+            {/* 📱 MOBILE VIEW: মোবাইলে স্ক্রোলিং এড়াতে কার্ড লেআউট */}
             <div className="block md:hidden space-y-4">
               {orders.map((order) => {
                 const orderId = order._id || order.id;
+                // প্রোডাক্টের সঠিক আইডি ট্র‍্যাক করার জন্য ফলব্যাক কন্ডিশন
+                const fabricProductId = order.productId || order.fabricId || (order.product && (order.product._id || order.product.id)) || orderId;
+
                 return (
                   <div key={orderId} className="border border-white/5 rounded-2xl bg-zinc-900/20 p-5 space-y-4">
                     <div className="flex justify-between items-start">
@@ -390,7 +393,7 @@ export default function Dashboard() {
                       {/* অ্যাকশন বাটনসমূহ */}
                       <div className="flex items-center gap-2">
                         <Link
-                          href={`/products/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
+                          href={`/shop/${fabricProductId}`} // 👈 মোবাইল ভিউতে অরিজিনাল ফিক্সড রাউট
                           className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors"
                         >
                           View
@@ -410,7 +413,7 @@ export default function Dashboard() {
               })}
             </div>
 
-            {/* 💻 DESKTOP & TABLET VIEW: বড় স্ক্রিনের জন্য আগের পারফেক্ট টেবিল */}
+            {/* 💻 DESKTOP & TABLET VIEW: বড় স্ক্রিনের জন্য আগের পারফেক্ট টেবিল */}
             <div className="hidden md:block overflow-x-auto border border-white/5 rounded-2xl bg-zinc-900/20">
               <table className="w-full text-left text-sm text-zinc-300">
                 <thead className="bg-zinc-950 text-zinc-400 text-xs font-semibold uppercase tracking-wider border-b border-white/5">
@@ -425,6 +428,9 @@ export default function Dashboard() {
                 <tbody className="divide-y divide-white/5">
                   {orders.map((order) => {
                     const orderId = order._id || order.id;
+                    // প্রোডাক্টের সঠিক আইডি ট্র‍্যাক করার জন্য ফলব্যাক কন্ডিশন
+                    const fabricProductId = order.productId || order.fabricId || (order.product && (order.product._id || order.product.id)) || orderId;
+
                     return (
                       <tr key={orderId} className="hover:bg-zinc-900/40">
                         <td className="px-6 py-4 font-mono text-xs text-zinc-400">{order.userEmail}</td>
@@ -436,9 +442,8 @@ export default function Dashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
-                          {/* ডায়নামিক View বাটন */}
                           <Link
-                            href={`/shop/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
+                            href={`/shop/${fabricProductId}`} // 👈 ডেস্কটপ ভিউতে অরিজিনাল ফিক্সড রাউট
                             className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors inline-block"
                           >
                             View
