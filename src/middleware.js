@@ -59,9 +59,11 @@
 
 
 
+
 import { NextResponse } from "next/server";
+import { auth } from "./app/lib/auth";
 // import type { NextRequest } from "next/server";
-import { auth } from "./lib/auth";
+// import { auth } from "./lib/auth";
 
 export const runtime = "nodejs";
 
