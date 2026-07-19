@@ -3,10 +3,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { signIn, signUp } from '@/app/lib/auth-client';
+import { signIn } from '@/app/lib/auth-client';
 import { toast } from 'react-toastify';
-
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -52,76 +50,16 @@ export default function Login() {
     }
   };
 
-  // Handle the custom Demo Login API call to the Express backend
-  const handleDemoLogin = async () => {
+  // Demo Login button e click korle input field fill hobe
+  const handleDemoLogin = () => {
     setError('');
-    setLoading(true);
     setSuccess('');
 
-    try {
-      const res = await fetch(`${SERVER_URL}/api/demo-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    // Input field e state manually set kore deya hochhe
+    setEmail('user@gmail.com');
+    setPassword('user1234@');
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        toast.success('Authenticated as Demo User! Establishing session...');
-        const emailVal = data.credentials.email;
-        const passwordVal = data.credentials.password;
-
-        try {
-          const { data: authData, error: authError } = await signIn.email({
-            email: emailVal,
-            password: passwordVal,
-          });
-
-          if (authError) {
-            // Auto-register the demo user if they don't exist
-            const { data: signUpData, error: signUpError } = await signUp.email({
-              email: emailVal,
-              password: passwordVal,
-              name: data.user.name,
-            });
-
-            if (signUpError) {
-              setError(signUpError.message || 'Failed to auto-register demo user.');
-              setLoading(false);
-              return;
-            }
-          }
-
-          localStorage.setItem('user', JSON.stringify(data.user));
-          toast.success('Demo session active! Redirecting...');
-          setSuccess('Demo session active! Redirecting...');
-          setTimeout(() => {
-            window.location.replace('/shop');
-          }, 1000);
-        } catch (authErr) {
-          console.error('Demo auth client error:', authErr);
-          setError('Failed to establish Better Auth session.');
-        }
-      } else {
-        setError(data.error || 'Failed to authenticate with backend demo user.');
-      }
-    } catch (err) {
-      console.log('Demo login server offline, running fallback direct redirection.', err);
-
-      // Local storage fallbacks
-      localStorage.setItem('user', JSON.stringify({ name: 'Demo User', email: 'demo@example.com' }));
-
-      toast.success('Demo Login Successful! Redirecting...');
-      setSuccess('Demo Login Successful! Redirecting...');
-
-      setTimeout(() => {
-        window.location.replace('/shop');
-      }, 1000);
-    } finally {
-      setLoading(false);
-    }
+    toast.info('Demo credentials auto-filled! Click Sign In to proceed.');
   };
 
   return (
@@ -205,7 +143,7 @@ export default function Login() {
           onClick={handleDemoLogin}
           className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800/80 py-3 text-sm font-semibold text-zinc-300 transition-all cursor-pointer flex items-center justify-center gap-2"
         >
-          {loading ? 'Processing...' : 'Access Demo Space'}
+          Access Demo Space
         </button>
 
         {/* Bottom Link */}
