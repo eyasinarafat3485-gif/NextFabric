@@ -66,21 +66,23 @@ export async function middleware(request) {
   const isDashboard = pathname.startsWith("/dashboard");
   const isCollection = pathname.startsWith("/collection");
 
-  // রুটটি প্রটেক্টেড (/dashboard বা /collection) হলে কুকি চেক হবে
+  // রুটটি প্রটেক্টেড (/dashboard বা /collection) হলে সেশন কুকি চেক হবে
   if (isDashboard || isCollection) {
     const sessionToken = request.cookies.get("better-auth.session_token") ||
       request.cookies.get("__secure-better-auth.session_token");
 
-    // ১. ইউজার লগইন না থাকলে সরাসরি লগইন পেজে পাঠান
+    // ১. প্রথম শর্ত: সেশন টোকেন বা সেশন কুকি না থাকলে সরাসরি লগইন পেজে রিডাইরেক্ট
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // ২. ইউজার লগইন করা আছে এবং সে যদি ড্যাশবোর্ডে (Admin-only) যেতে চায়
+    // ২. সেশন টোকেন আছে (ইউজার লগইনড)। এবার রোল-বেসড প্রটেকশন:
+    // Better-Auth লাইভ সার্ভারে কুকির ভ্যালু বা স্টেট ম্যানেজ করে। 
+    // অ্যাডমিন ছাড়া অন্য কোনো রোল বা রেগুলার ইউজার যদি /dashboard এ যাওয়ার চেষ্টা করে:
     if (isDashboard) {
       try {
+        // ফ্রন্টএন্ড সেশন ভেরিফিকেশন কল
         const targetUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
-
         const sessionRes = await fetch(`${targetUrl}/api/auth/get-session`, {
           headers: {
             "Cookie": `${sessionToken.name}=${sessionToken.value}`,
@@ -90,28 +92,23 @@ export async function middleware(request) {
         if (sessionRes.ok) {
           const session = await sessionRes.json();
 
-          // ইউজার যদি লগইন করা থাকে কিন্তু সে 'admin' না হয়, তবে তাকে /collection এ রিডাইরেক্ট করুন
-          if (session && session.user && session.user.role !== "admin") {
+          // সেশন থেকে রোল চেক: রোল যদি 'admin' না হয়, তবে শুধু /collection পেজে রিডাইরেক্ট হবে
+          if (!session || !session.user || session.user.role !== "admin") {
             return NextResponse.redirect(new URL("/collection", request.url));
           }
-
-          // অ্যাডমিন হলে নরমালি ড্যাশবোর্ডে যেতে পারবে
-          return NextResponse.next();
+        } else {
+          // কোনো কারণে এপিআই রেসপন্স না পেলে সেফটি হিসেবে /collection এ রিডাইরেক্ট করুন
+          return NextResponse.redirect(new URL("/collection", request.url));
         }
-
-        // যদি এপিআই রেসপন্স ওকে না হয় (যেমন ৪MD বা অন্য এরর), লাইভে সেফটি হিসেবে /collection এ পাঠান, লগইনে নয়
-        return NextResponse.redirect(new URL("/collection", request.url));
-
       } catch (err) {
-        console.error("Middleware session verification error:", err);
-
-        // লাইভ সার্ভারে ইন্টারনাল ফেচ ফেইল করলেও যেহেতু কুকি (sessionToken) আছে, 
-        // তাই তাকে লগইন পেজে না পাঠিয়ে সেফটি হিসেবে সরাসরি /collection পেজে অ্যাক্সেস দিয়ে দিন
-        return NextResponse.next();
+        console.error("Session fetch error:", err);
+        // লাইভে নেটওয়ার্ক টাইমআউট বা ফেইলুর হলে ইউজারকে লগইন পেজে না পাঠিয়ে /collection এ অ্যাক্সেস দিন
+        return NextResponse.redirect(new URL("/collection", request.url));
       }
     }
 
-    // ইউজার যদি শুধু /collection এ যায়, তাহলে ওপরের কুকি চেক পার হওয়াই যথেষ্ট।
+    // ইউজার যদি শুধু /collection এ যেতে চায়, তাহলে সেশন কুকি থাকাই যথেষ্ট।
+    // রেগুলার ইউজার এবং অ্যাডমিন উভয়েই সরাসরি /collection এ অ্যাক্সেস পাবে।
   }
 
   return NextResponse.next();
