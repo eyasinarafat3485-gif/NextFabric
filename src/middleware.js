@@ -4,7 +4,7 @@ export async function middleware(request) {
   const { pathname, origin } = request.nextUrl;
 
   const isDashboard = pathname.startsWith("/dashboard");
-  const isCollection = pathname.startsWith("/collection") || pathname.startsWith("/my-collection");
+  const isCollection = pathname.startsWith("/collection") || pathname.startsWith("/collection");
 
   // ১. যদি প্রটেক্টেড রুট হয়, তবে প্রথমে টোকেন চেক করুন
   if (isDashboard || isCollection) {
@@ -53,6 +53,5 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/collection/:path*",
-    "/my-collection/:path*"
   ],
 };
