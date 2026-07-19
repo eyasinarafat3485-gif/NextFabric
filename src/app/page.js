@@ -174,7 +174,7 @@ export default function Home() {
         </div>
 
         {trendingLoading ? (
-          <div className="text-center py-20 text-zinc-500">Loading trending products...</div>
+          <div className="text-center pt-20 text-zinc-500">Loading trending products...</div>
         ) : trendingProducts.length === 0 ? (
           <div className="text-center py-20 border border-white/5 rounded-2xl bg-zinc-900/20">
             <p className="text-zinc-400 text-lg">No trending products found.</p>
@@ -285,7 +285,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 3: CATEGORIES GRID                           */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
+      <section className="mx-auto max-w-7xl px-6 pt-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Curated Collections by Use Case
@@ -351,7 +351,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 4: VISUAL HIGHLIGHTS / DYNAMIC BANNER        */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+      <section className="mx-auto max-w-7xl px-6 pt-20 lg:px-8">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 to-zinc-900/40 border border-white/5 px-6 py-15 shadow-2xl ">
           {/* Neon radial mesh glow */}
           <div className="absolute top-0 right-0 -mt-20 -mr-20 h-80 w-80 rounded-full bg-gradient-to-br from-brand-indigo/25 to-brand-cyan/25 blur-3xl pointer-events-none" />
@@ -381,7 +381,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 5: STATISTICS / MILESTONES                   */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
+      <section className="mx-auto max-w-7xl px-6 pt-20 lg:px-8 ">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             {
@@ -416,7 +416,7 @@ export default function Home() {
       {/* ---------------------------------------------------- */}
       {/* SECTION 6: TESTIMONIALS                              */}
       {/* ---------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8 ">
+      <section className="mx-auto max-w-7xl px-6 pt-20 lg:px-8 ">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Trusted by the Design Community
