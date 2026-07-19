@@ -299,7 +299,7 @@ export default function Dashboard() {
       </div>
 
       {/* --- সম্পূর্ণ নতুন ৩য় সেকশন: ইউজারদের করা অর্ডারের লিস্ট --- */}
-      <div className="border-t border-white/5 pt-12">
+      {/* <div className="border-t border-white/5 pt-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white">All User Fabric Orders ({orders.length})</h2>
           <button onClick={fetchOrders} className="text-xs text-brand-cyan font-medium cursor-pointer">🔄 Refresh Orders</button>
@@ -348,6 +348,119 @@ export default function Dashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div> */}
+
+
+       // যদি React Router ব্যবহার করেন তবে: import {Link} from 'react-router-dom';
+
+      // ... আপনার বাকি কোড
+
+      <div className="border-t border-white/5 pt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">All User Fabric Orders ({orders.length})</h2>
+          <button onClick={fetchOrders} className="text-xs text-brand-cyan font-medium cursor-pointer">🔄 Refresh Orders</button>
+        </div>
+
+        {ordersLoading ? (
+          <div className="text-center py-10 text-zinc-500">Loading purchase histories from database vault...</div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-12 border border-white/5 rounded-2xl bg-zinc-900/20 text-zinc-400">
+            No active orders have been made by users yet.
+          </div>
+        ) : (
+          <div>
+            {/* 📱 MOBILE VIEW: মোবাইলে স্ক্রোলিং এড়াতে কার্ড লেআউট */}
+            <div className="block md:hidden space-y-4">
+              {orders.map((order) => {
+                const orderId = order._id || order.id;
+                return (
+                  <div key={orderId} className="border border-white/5 rounded-2xl bg-zinc-900/20 p-5 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium text-white text-base">{order.title}</h3>
+                        <p className="font-mono text-xs text-zinc-400 mt-1">{order.userEmail}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${order.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'}`}>
+                        {order.status}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                      <span className="text-brand-cyan font-semibold text-base">${order.price.toFixed(2)}</span>
+
+                      {/* অ্যাকশন বাটনসমূহ */}
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/products/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
+                          className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors"
+                        >
+                          View
+                        </Link>
+                        {order.status !== 'Confirmed' && (
+                          <button onClick={() => handleConfirmOrder(orderId)} className="rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white px-3 py-1.5 text-xs font-semibold transition-colors">
+                            Confirm
+                          </button>
+                        )}
+                        <button onClick={() => handleDeleteOrder(orderId)} className="rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 text-xs font-semibold transition-colors">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 💻 DESKTOP & TABLET VIEW: বড় স্ক্রিনের জন্য আগের পারফেক্ট টেবিল */}
+            <div className="hidden md:block overflow-x-auto border border-white/5 rounded-2xl bg-zinc-900/20">
+              <table className="w-full text-left text-sm text-zinc-300">
+                <thead className="bg-zinc-950 text-zinc-400 text-xs font-semibold uppercase tracking-wider border-b border-white/5">
+                  <tr>
+                    <th className="px-6 py-4">User Email</th>
+                    <th className="px-6 py-4">Fabric Title</th>
+                    <th className="px-6 py-4">Total Price</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {orders.map((order) => {
+                    const orderId = order._id || order.id;
+                    return (
+                      <tr key={orderId} className="hover:bg-zinc-900/40">
+                        <td className="px-6 py-4 font-mono text-xs text-zinc-400">{order.userEmail}</td>
+                        <td className="px-6 py-4 font-medium text-white">{order.title}</td>
+                        <td className="px-6 py-4 text-brand-cyan font-semibold">${order.price.toFixed(2)}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${order.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right space-x-2">
+                          {/* ডায়নামিক View বাটন */}
+                          <Link
+                            href={`/products/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
+                            className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors inline-block"
+                          >
+                            View
+                          </Link>
+                          {order.status !== 'Confirmed' && (
+                            <button onClick={() => handleConfirmOrder(orderId)} className="rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white px-3 py-1.5 text-xs font-semibold transition-colors">
+                              Confirm
+                            </button>
+                          )}
+                          <button onClick={() => handleDeleteOrder(orderId)} className="rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 text-xs font-semibold transition-colors">
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
