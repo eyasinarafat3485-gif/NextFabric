@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
-  const { pathname, origin } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   const isDashboard = pathname.startsWith("/dashboard");
-  const isCollection = pathname.startsWith("/collection"); // শুধুমাত্র /collection রাখলাম
+  const isCollection = pathname.startsWith("/collection");
 
   // রুটটি প্রটেক্টেড (/dashboard বা /collection) হলে কুকি চেক হবে
   if (isDashboard || isCollection) {
@@ -16,33 +16,37 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // ২. ইউজার লগইন করা আছে এবং সে যদি ড্যাশবোর্ডে (Admin-only) যেতে চায়
+    // ২. ইউজার লগইন করা আছে এবং সে যদি ড্যাশবোর্ডে (Admin-only) যেতে চায়
     if (isDashboard) {
       try {
-        const sessionRes = await fetch(`${origin}/api/auth/get-session`, {
+        // লাইভ এবং লোকালহোস্ট দুই জায়গাতেই যেন সঠিক ডোমেইন পায় তার জন্য absolute URL নিশ্চিত করা হলো
+        const productionUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+        
+        const sessionRes = await fetch(`${productionUrl}/api/auth/get-session`, {
           headers: {
             "Cookie": `${sessionToken.name}=${sessionToken.value}`,
           },
         });
 
-        // যদি সেশন এপিআই রেসপন্স ওয়ান না হয়, লগইন পেজে পাঠান
+        // যদি সেশন এপিআই রেসপন্স ওকে না হয়, লগইন পেজে পাঠান
         if (!sessionRes.ok) {
           return NextResponse.redirect(new URL("/login", request.url));
         }
 
         const session = await sessionRes.json();
 
-        // ইউজার যদি লগইন করা থাকে কিন্তু সে 'admin' না হয়, তবে তাকে /login এ রিডাইরেক্ট করুন
+        // ইউজার যদি লগইন করা থাকে কিন্তু সে 'admin' না হয়, তবে তাকে /collection এ রিডাইরেক্ট করুন (শর্ত অনুযায়ী)
         if (!session || !session.user || session.user.role !== "admin") {
-          return NextResponse.redirect(new URL("/login", request.url));
+          return NextResponse.redirect(new URL("/collection", request.url));
         }
       } catch (err) {
         console.error("Middleware session verification error:", err);
+        // লাইভে কোনো কারণে ইন্টারনাল ফেচ এরর হলে সরাসরি ব্লক না করে সেফ রিডাইরেক্ট
         return NextResponse.redirect(new URL("/login", request.url));
       }
     }
 
-    // ইউজার যদি শুধু /collection এ যায়, তাহলে ওপরের কুকি চেক পার হওয়াই যথেষ্ট।
+    // ইউজার যদি শুধু /collection এ যায়, তাহলে ওপরের কুকি চেক পার হওয়াই যথেষ্ট।
     // সাধারণ ইউজাররা সরাসরি পেজে অ্যাক্সেস পাবে।
   }
 
@@ -52,6 +56,6 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/collection/:path*", // ম্যাচার থেকেও /my-collection বাদ দেওয়া হয়েছে
+    "/collection/:path*",
   ],
 };
