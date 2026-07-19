@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { signIn, signUp } from '@/app/lib/auth-client';
 import { toast } from 'react-toastify';
 
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;    
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,7 +59,7 @@ export default function Login() {
     setSuccess('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/demo-login', {
+      const res = await fetch(`${SERVER_URL}/api/demo-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

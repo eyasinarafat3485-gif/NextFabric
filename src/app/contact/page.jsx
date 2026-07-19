@@ -208,9 +208,9 @@ export default function ContactPage() {
                     <div>
                         <p className="text-sm text-zinc-500 mb-3">Or reach us on</p>
                         <div className="flex gap-4">
-                            <a href="#" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">Facebook</a>
-                            <a href="#" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">Instagram</a>
-                            <a href="#" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">WhatsApp</a>
+                            <a href="https://web.facebook.com/eyasinarafatwebdev12" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">Facebook</a>
+                            <a href="https://www.linkedin.com/in/md-eyasin-arafat-webdev" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">LinkedIn</a>
+                            <a href="https://github.com/eyasinarafat3485-gif" className="bg-zinc-900 hover:bg-zinc-800 px-6 py-3 rounded-xl transition">GitHub</a>
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;    
 
 export default function MyCollection() {
     const [savedItems, setSavedItems] = useState([]);
@@ -20,7 +21,7 @@ export default function MyCollection() {
 
         async function fetchUserCollection() {
             try {
-                const res = await fetch(`http://localhost:5000/api/user-collection?email=${loggedInUser.email}`);
+                const res = await fetch(`${SERVER_URL}/api/user-collection?email=${loggedInUser.email}`);
                 if (res.ok) {
                     const data = await res.json();
                     setSavedItems(data);

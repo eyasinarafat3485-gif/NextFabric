@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 // বিল্ড এরর ফিক্স করার জন্য লোকাল ফলব্যাক ডিফাইন করা হলো
 const FALLBACK_PRODUCTS = [];
@@ -28,7 +29,7 @@ export default function ProductDetails({ params }) {
     // 2. Also try fetching live product from Express database
     async function fetchLiveProduct() {
       try {
-        const res = await fetch(`http://localhost:5000/api/items`);
+        const res = await fetch(`${SERVER_URL}/api/items`);
         if (res.ok) {
           const data = await res.json();
           const liveProduct = data.find(p => (p._id === id || p.id === id));
@@ -93,7 +94,7 @@ export default function ProductDetails({ params }) {
 
     setBuying(true);
     try {
-      const res = await fetch('http://localhost:5000/api/user-collection', {
+      const res = await fetch(`${SERVER_URL}/api/user-collection`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
