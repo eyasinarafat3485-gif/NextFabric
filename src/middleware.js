@@ -37,7 +37,7 @@ export async function middleware(request) {
       if (isDashboard && session.user.role !== "admin") {
         return NextResponse.redirect(new URL("/collection", request.url));
       }
-      
+
       // 3. Logged In (Admin): Allowed in both /dashboard and /collection (proceed automatically)
     } catch (err) {
       console.error("Middleware session verification error:", err);
