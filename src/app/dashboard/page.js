@@ -194,8 +194,8 @@ export default function Dashboard() {
             Admin console to manage product stocks and client fabric orders.
           </p>
         </div>
-        <Link href="/shop" className="rounded-xl border border-white/10 hover:border-brand-cyan/40 px-4 py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors">
-          View Storefront &rarr;
+        <Link href="/shop" className="rounded-xl bg-zinc-900 border border-white/10 hover:border-brand-cyan px-5 py-2.5 text-sm font-semibold text-brand-cyan transition-all">
+          &larr; View Storefront
         </Link>
       </div>
 
