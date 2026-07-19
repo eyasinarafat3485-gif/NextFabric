@@ -136,7 +136,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 // Better Auth ক্লায়েন্ট সেশন ইম্পোর্ট করা হলো
-import { authClient } from "@/lib/auth-client";
+import { authClient } from '@/app/lib/auth-client';
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
