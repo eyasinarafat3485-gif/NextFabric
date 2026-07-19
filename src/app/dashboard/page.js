@@ -353,9 +353,6 @@ export default function Dashboard() {
       </div> */}
 
 
-       // যদি React Router ব্যবহার করেন তবে: import {Link} from 'react-router-dom';
-
-      // ... আপনার বাকি কোড
 
       <div className="border-t border-white/5 pt-12">
         <div className="flex items-center justify-between mb-6">
@@ -441,7 +438,7 @@ export default function Dashboard() {
                         <td className="px-6 py-4 text-right space-x-2">
                           {/* ডায়নামিক View বাটন */}
                           <Link
-                            href={`/products/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
+                            href={`/shop/${orderId}`} // React Router হলে: to={`/products/${orderId}`}
                             className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors inline-block"
                           >
                             View
