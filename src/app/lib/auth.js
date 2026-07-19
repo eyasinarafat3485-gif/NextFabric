@@ -23,4 +23,11 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    // গুগলের সোশ্যাল লগইন সচল করার জন্য এই অংশটুকু যুক্ত করতে হবে ⚡
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        },
+    },
 });
