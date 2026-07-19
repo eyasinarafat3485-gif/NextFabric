@@ -372,8 +372,15 @@ export default function Dashboard() {
             <div className="block md:hidden space-y-4">
               {orders.map((order) => {
                 const orderId = order._id || order.id;
-                // প্রোডাক্টের সঠিক আইডি ট্র‍্যাক করার জন্য ফলব্যাক কন্ডিশন
-                const fabricProductId = order.productId || order.fabricId || (order.product && (order.product._id || order.product.id)) || orderId;
+
+                // 🎯 ফিক্সড প্রোডাক্ট আইডি ট্র্যাক চেইন (ডিজাইন বা লজিক চেঞ্জ ছাড়া)
+                const fabricProductId =
+                  (order.item && (order.item._id || order.item.id)) ||
+                  (order.product && (order.product._id || order.product.id)) ||
+                  order.productId ||
+                  order.fabricId ||
+                  order.itemId ||
+                  orderId;
 
                 return (
                   <div key={orderId} className="border border-white/5 rounded-2xl bg-zinc-900/20 p-5 space-y-4">
@@ -393,7 +400,7 @@ export default function Dashboard() {
                       {/* অ্যাকশন বাটনসমূহ */}
                       <div className="flex items-center gap-2">
                         <Link
-                          href={`/shop/${fabricProductId}`} // 👈 মোবাইল ভিউতে অরিজিনাল ফিক্সড রাউট
+                          href={`/shop/${fabricProductId}`}
                           className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors"
                         >
                           View
@@ -428,8 +435,15 @@ export default function Dashboard() {
                 <tbody className="divide-y divide-white/5">
                   {orders.map((order) => {
                     const orderId = order._id || order.id;
-                    // প্রোডাক্টের সঠিক আইডি ট্র‍্যাক করার জন্য ফলব্যাক কন্ডিশন
-                    const fabricProductId = order.productId || order.fabricId || (order.product && (order.product._id || order.product.id)) || orderId;
+
+                    // 🎯 ফিক্সড প্রোডাক্ট আইডি ট্র্যাক চেইন (ডিজাইন বা লজিক চেঞ্জ ছাড়া)
+                    const fabricProductId =
+                      (order.item && (order.item._id || order.item.id)) ||
+                      (order.product && (order.product._id || order.product.id)) ||
+                      order.productId ||
+                      order.fabricId ||
+                      order.itemId ||
+                      orderId;
 
                     return (
                       <tr key={orderId} className="hover:bg-zinc-900/40">
@@ -443,7 +457,7 @@ export default function Dashboard() {
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
                           <Link
-                            href={`/shop/${fabricProductId}`} // 👈 ডেস্কটপ ভিউতে অরিজিনাল ফিক্সড রাউট
+                            href={`/shop/${fabricProductId}`}
                             className="rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 px-3 py-1.5 text-xs font-semibold transition-colors inline-block"
                           >
                             View
