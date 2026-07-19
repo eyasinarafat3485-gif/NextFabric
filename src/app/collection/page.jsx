@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;    
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export default function MyCollection() {
     const [savedItems, setSavedItems] = useState([]);
@@ -51,7 +51,7 @@ export default function MyCollection() {
 
                     <Link
                         href="/shop"
-                        className="rounded-xl border border-white/10 hover:border-brand-indigo/40 px-4 py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors self-start sm:self-auto"
+                        className="rounded-xl bg-zinc-900 border border-white/10 hover:border-brand-cyan px-5 py-2.5 text-sm font-semibold text-brand-cyan transition-all"
                     >
                         &larr; Back to Shop Catalog
                     </Link>
