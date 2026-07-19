@@ -4,24 +4,26 @@ export async function middleware(request) {
   const { pathname, origin } = request.nextUrl;
 
   const isDashboard = pathname.startsWith("/dashboard");
-  const isCollection = pathname.startsWith("/collection") || pathname.startsWith("/collection");
+  const isCollection = pathname.startsWith("/collection") || pathname.startsWith("/my-collection");
 
-  // ১. যদি প্রটেক্টেড রুট হয়, তবে প্রথমে টোকেন চেক করুন
+  // শর্ত ১: সুরক্ষিত রুট হলে প্রথমে ব্রাউজারে সেশন টোকেন আছে কিনা চেক করুন
   if (isDashboard || isCollection) {
     const sessionToken = request.cookies.get("better-auth.session_token") ||
       request.cookies.get("__secure-better-auth.session_token");
 
-    // টোকেন না থাকলে সরাসরি লগইন পেজে পাঠান
+    // টোকেন না থাকলে (লগইন করা না থাকলে) সরাসরি লগইন পেজে রিডাইরেক্ট
     if (!sessionToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // ২. শুধুমাত্র ড্যাশবোর্ড (Admin-only) রুটের জন্য সেশন ভেরিফাই ও রোল চেক করুন
+    // শর্ত ২: ইউজার লগইন করা আছে, কিন্তু সে যদি ড্যাশবোর্ডে (Admin-only) যেতে চায়
     if (isDashboard) {
       try {
+        // Better-Auth সেশন ডেটা চেক করার জন্য রিকোয়েস্ট
         const sessionRes = await fetch(`${origin}/api/auth/get-session`, {
           headers: {
-            cookie: request.headers.get("cookie") || "",
+            // টোকেনটি সরাসরি Authorization হেডার বা কুকি হিসেবে পাস করা নিশ্চিত করা
+            "Cookie": `${sessionToken.name}=${sessionToken.value}`,
           },
         });
 
@@ -31,9 +33,10 @@ export async function middleware(request) {
 
         const session = await sessionRes.json();
 
-        // যদি সেশন না থাকে অথবা ইউজার অ্যাডমিন না হয়
+        // ইউজার যদি লগইন করা থাকে কিন্তু সে 'admin' না হয়, তবে তাকে আটকে দিন
         if (!session || !session.user || session.user.role !== "admin") {
-          // এখানে আপনি চাইলে /login এ না পাঠিয়ে একটি /unauthorized পেজেও পাঠাতে পারেন
+          // ড্যাশবোর্ডে অ্যাক্সেস নেই তাই তাকে হোমপেজে বা অন্য কোথাও পাঠানোই ভালো, 
+          // তবে আপনার রিকোয়ারমেন্ট অনুযায়ী এখানে /login এ পাঠানো হলো।
           return NextResponse.redirect(new URL("/login", request.url));
         }
       } catch (err) {
@@ -42,8 +45,8 @@ export async function middleware(request) {
       }
     }
 
-    // /collection বা /my-collection এর জন্য সেশন টোকেন থাকাই যথেষ্ট, 
-    // তাই আলাদা কোনো অ্যাডমিন চেকের প্রয়োজন নেই।
+    // ইউজার যদি ড্যাশবোর্ডে না গিয়ে শুধু /collection এ যায়, 
+    // তাহলে টোকেন থাকাই যথেষ্ট। সে সরাসরি পেজে ঢুকে যাবে।
   }
 
   return NextResponse.next();
@@ -53,5 +56,6 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/collection/:path*",
+    "/my-collection/:path*"
   ],
 };
